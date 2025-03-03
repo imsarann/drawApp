@@ -1,13 +1,10 @@
-import { CONNECTING, WebSocketServer } from "ws";
+import { WebSocketServer } from 'ws';
 
-const wss = new WebSocketServer({ port : 8080 });
+const wss = new WebSocketServer({port : 8080});
 
-wss.on('connection', (ws)=>{
-    ws.on('error', ()=>{
-        console.error
-    })
-    ws.on('message', (data)=>{
-        ws.send('ping')
-        console.log("message received "+data);
+wss.on('connection', function connection(ws){
+    console.log("websocket connected");
+    ws.on('message', function message(data){
+        ws.send('pong');
     })
 })

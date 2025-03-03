@@ -1,7 +1,7 @@
-import express from "express";
+import express, { Router } from "express";
+import { authRouter } from "./auth.js";
 const app = express();
-const PORT = 3000;
 
-app.listen(PORT, () =>{
-    console.log("Express is connected sucessfully at http://localhost"+PORT);
-})
+app.use("/auth", authRouter);
+
+app.listen(5000);
