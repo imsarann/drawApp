@@ -1,7 +1,7 @@
 import jwt, { decode } from "jsonwebtoken"
-import { JWT_SECRET } from "./config";
+import { JWT_SECRET } from "@repo/backend-common/config";
 
-export function middlewar(req : any, res :any , next : any){
+function middlewar(req : any, res :any , next : any){
     const token = req.header["authorization"] ?? "";
     const decoded = jwt.verify(token, JWT_SECRET)
 
@@ -14,3 +14,5 @@ export function middlewar(req : any, res :any , next : any){
     })
     }
 }
+
+export { middlewar }
