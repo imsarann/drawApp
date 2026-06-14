@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const CreateUserSchema = z.object({
+    // id : 
     username : z.string(),
     password : z.string(),
     name : z.string()  
