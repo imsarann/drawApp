@@ -1,50 +1,49 @@
 import express from "express";
-import jwt from "jsonwebtoken"
-import { JWT_SECRET } from "@repo/backend-common/config";
+// import jwt from "jsonwebtoken"
+// import { JWT_SECRET } from "@repo/backend-common/config";
 import { middlewar } from "./middleware";
 import { CreateUserSchema } from "@repo/common/types"
 import { SigninSchema } from "@repo/common/types";
-import { createRoomSchema } from "@repo/common/types";
-import { prismaClient } from "@repo/db/client"
+import { prisma } from "@repo/db/client";
 
 const app = express()
+app.use(express.json());
 
-app.listen(3000, ()=>{
+app.listen(3001, ()=>{
   console.log("express connected");
 })
 
-app.post("/signup", async (req, res)=>{
+app.post("/signup", async (req, res) => {
+  console.log("Control reached to signup endpoint")
+  const parsedData = CreateUserSchema.safeParse(req.body);
+  console.log("body", req.body)
   
-  const parsedData  = CreateUserSchema.safeParse(req.body)
-  if(!parsedData.success){
-    res.json({
-      message : "Incorrect inputs"
-    })
-    return;
+  if (!parsedData.success) {
+    return res.status(400).json({
+      message: "Incorrect inputs",
+    });
   }
-  try{
-await prismaClient.user.create({
-    data: {
-      email : parsedData.data.username,
-      password : parsedData.data.password,
-      name : parsedData.data.name,
-      
-    }
-  })
-  }catch(e){
-    res.status(411).json({
-      message : "User already exists with this email"
-    })
-  }
-  // const userId = req.body.userId;
-  //   //dataase check
-  // const token = jwt.sign(userId, JWT_SECRET)
-  res.json({
-    message : "You have successfully singed up",
-    // token 
-})
 
-})
+
+  try {
+    await prisma.user.create({
+      data: {
+        email: parsedData.data.username,
+        password: parsedData.data.password,
+        name: parsedData.data.name,
+      },
+    });
+
+    return res.json({
+      message: "You have successfully signed up",
+    });
+  } catch (e) {
+    return res.status(409).json({
+      message: "User already exists with this email",
+      e
+    });
+  }
+});
 
 app.post("/signin", (req, res)=>{
   const data = SigninSchema.safeParse(req.body)
@@ -56,10 +55,10 @@ app.post("/signin", (req, res)=>{
   }
   // database check
   //store in database
-  const token = jwt.sign(userId, JWT_SECRET)
+  // const token = jwt.sign(userId, JWT_SECRET)
   res.json({
     message : "You have successfully logged in , Welcome back",
-    token 
+    // token 
   })
   
 })
