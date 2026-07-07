@@ -4,10 +4,14 @@ import express from "express";
 import { middlewar } from "./middleware";
 import { CreateUserSchema } from "@repo/common/types"
 import { SigninSchema } from "@repo/common/types";
-import { prisma } from "@repo/db/client";
+import { prisma } from "@repo/db/client"
 
 const app = express()
 app.use(express.json());
+
+// console.log("DATABASE_URL =", process.env.DATABASE_URL);
+// console.log("cwd:", process.cwd());
+// console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 app.listen(3001, ()=>{
   console.log("express connected");
@@ -39,7 +43,7 @@ app.post("/signup", async (req, res) => {
     });
   } catch (e) {
     return res.status(409).json({
-      message: "User already exists with this email",
+      // message: "User already exists with this email",
       e
     });
   }

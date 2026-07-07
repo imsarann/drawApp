@@ -12,13 +12,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@repo/backend-common": "workspace:*",
+    "@repo/common": "workspace:*",
+    "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/backend-common" : "workspace:*",
-    "@repo/common" : "workspace:*",
-    "@repo/db" : "workspace:*",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3"
   }
 }
