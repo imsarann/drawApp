@@ -1,15 +1,18 @@
 import express from "express";
-import { middlewar } from "./middleware";
+import { middleware } from "./middleware";
 import { CreateUserSchema } from "@repo/common/types"
 import { SigninSchema } from "@repo/common/types";
-// import { prisma } from "@repo/db";
-
+import { prismaClient } from "@repo/db/client";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "@repo/backend-common/config";
 const app = express()
 app.use(express.json());
 
 app.listen(3001, ()=>{
   console.log("express connected 3001");
 })
+
+// Get endpoint
 
 app.get("/", (req, res)=>{
   console.log("Control reached to root '/' endpoint")
@@ -18,71 +21,91 @@ app.get("/", (req, res)=>{
   })
 })
 
+// Signup endpoint
+
 app.post("/signup", async (req, res) => {
-  console.log("Control reached to signup endpoint")
+
   const parsedData = CreateUserSchema.safeParse(req.body);
-  console.log("body", req.body)
-  
   if (!parsedData.success) {
     return res.status(400).json({
       message: "Incorrect inputs",
     });
   }
 
-
   try {
-    await prisma.user.create({
+    const user = await prismaClient.user.create({
       data: {
         email: parsedData.data.username,
+        // hash the password before storing it in the database
         password: parsedData.data.password,
         name: parsedData.data.name,
       },
     });
-
+    const token = jwt.sign({ userId : user.id }, JWT_SECRET);
     return res.json({
       message: "You have successfully signed up",
+      // should return jwt token
+      userId : user.id,
+      token : token
     });
   } catch (e) {
     return res.status(409).json({
-      // message: "User already exists with this email",
+      message: "User already exists with this email",
       e
     });
   }
 });
 
-app.post("/signin", (req, res)=>{
-  const data = SigninSchema.safeParse(req.body)
-  if(!data.success){
+app.post("/signin", async (req, res)=>{
+  const parsedData = SigninSchema.safeParse(req.body)
+  if(!parsedData.success){
     res.json({
       message : "Invalid inputs"
     })
     return
   }
-  // database check
-  //store in database
-  // const token = jwt.sign(userId, JWT_SECRET)
+  // compare the password with the hashed password in the database
+    const user = await prismaClient.user.findUnique({
+      where : {
+        email : parsedData.data.username,
+        password : parsedData.data.password
+      }
+    })    
+    if(!user){
+        return res.status(401).json({
+            message: "User not found or incorrect credentials",
+        });
+    }
+    const token = jwt.sign({ userId : user.id }, JWT_SECRET);
   res.json({
-    message : "You have successfully logged in , Welcome back",
-    // token 
+    message : "You have successfully logged in , Welcome back", 
+    token : token
   })
   
 })
 
 
 
-app.post("/room", middlewar, (req, res)=>{
+app.post("/room", middleware, async (req, res)=>{
     
-  const data  = CreateUserSchema.safeParse(req.body)
-  if(!data.success){
+  const parsedData  = CreateUserSchema.safeParse(req.body)
+  if(!parsedData.success){
     res.json({
       message : "Incorrect inputs"
     })
     return
-
   }
-  // db call
+  // @ts-ignore
+  const userId = req.userId;
+  const room = await prismaClient.room.create({
+    data : {
+        slug : parsedData.data.name,
+        adminId : userId
+    }
+  })
   res.json({
-    roomId : 1
+    message : "Room created successfully",
+    roomId : room.id
   })
 
 })

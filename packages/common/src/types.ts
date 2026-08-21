@@ -9,8 +9,7 @@ const CreateUserSchema = z.object({
 
 const SigninSchema = z.object({
     username : z.string(),
-    password : z.string(),
-    name : z.string()  
+    password : z.string()
 })
 
 const createRoomSchema = z.object({

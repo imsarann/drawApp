@@ -1,8 +1,8 @@
 import jwt, { decode } from "jsonwebtoken"
 import { JWT_SECRET } from "@repo/backend-common/config";
 
-function middlewar(req : any, res :any , next : any){
-    const token = req.header["authorization"] ?? "";
+function middleware(req : any, res :any , next : any){
+    const token = req.header["Authorization"] ?? "";
     const decoded = jwt.verify(token, JWT_SECRET)
 
     if(decoded){
@@ -10,10 +10,10 @@ function middlewar(req : any, res :any , next : any){
         req.userId = decode.userId
         next();
     }else{
-        res.json({
-        message : "Unauthorized"       
+        return res.json({
+        message : "Unauthorized Log in again"       
     })
     }
 }
 
-export { middlewar }
+export { middleware }
