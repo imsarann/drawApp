@@ -8,6 +8,7 @@ function middlewar(req : any, res :any , next : any){
     if(decoded){
         // @ts-ignore 
         req.userId = decode.userId
+        next();
     }else{
         res.json({
         message : "Unauthorized"       

@@ -1,20 +1,21 @@
 import express from "express";
-// import jwt from "jsonwebtoken"
-// import { JWT_SECRET } from "@repo/backend-common/config";
 import { middlewar } from "./middleware";
 import { CreateUserSchema } from "@repo/common/types"
 import { SigninSchema } from "@repo/common/types";
-import { prisma } from "@repo/db/client"
+// import { prisma } from "@repo/db";
 
 const app = express()
 app.use(express.json());
 
-// console.log("DATABASE_URL =", process.env.DATABASE_URL);
-// console.log("cwd:", process.cwd());
-// console.log("DATABASE_URL:", process.env.DATABASE_URL);
-
 app.listen(3001, ()=>{
-  console.log("express connected");
+  console.log("express connected 3001");
+})
+
+app.get("/", (req, res)=>{
+  console.log("Control reached to root '/' endpoint")
+  res.json({
+    message : "Hello from express server"
+  })
 })
 
 app.post("/signup", async (req, res) => {
