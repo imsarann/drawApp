@@ -1,6 +1,6 @@
 import express from "express";
 import { middleware } from "./middleware";
-import { CreateUserSchema } from "@repo/common/types"
+import { createRoomSchema, CreateUserSchema } from "@repo/common/types"
 import { SigninSchema } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
 import jwt from "jsonwebtoken";
@@ -15,7 +15,6 @@ app.listen(3001, ()=>{
 // Get endpoint
 
 app.get("/", (req, res)=>{
-  console.log("Control reached to root '/' endpoint")
   res.json({
     message : "Hello from express server"
   })
@@ -88,7 +87,7 @@ app.post("/signin", async (req, res)=>{
 
 app.post("/room", middleware, async (req, res)=>{
     
-  const parsedData  = CreateUserSchema.safeParse(req.body)
+  const parsedData  = createRoomSchema.safeParse(req.body)
   if(!parsedData.success){
     res.json({
       message : "Incorrect inputs"
