@@ -20,6 +20,23 @@ app.get("/", (req, res)=>{
   })
 })
 
+app.get("/chats/:roomId", async (req, res)=>{
+  const roomId = Number(req.params.roomId);
+  const messages = await prismaClient.chat.findMany({
+    where:{
+      //@ts-ignore
+        roomId
+    },
+    orderBy :{
+      id : "desc"
+    },
+    "take" : 50
+  })
+  res.json({
+    messages
+  })
+})
+
 // Signup endpoint
 
 app.post("/signup", async (req, res) => {

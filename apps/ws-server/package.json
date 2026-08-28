@@ -15,6 +15,7 @@
     "@repo/typescript-config": "workspace:*",
     "@repo/backend-common" : "workspace:*",
     "@repo/common" : "workspace:*",
+    "@repo/db" : "workspace:*",
     "@types/jsonwebtoken": "^9.0.10",
     "jsonwebtoken": "^9.0.3",
     "ws": "^8.20.0"
