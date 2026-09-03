@@ -72,6 +72,8 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+//signin-point
+
 app.post("/signin", async (req, res)=>{
   const parsedData = SigninSchema.safeParse(req.body)
   if(!parsedData.success){
@@ -122,6 +124,18 @@ app.post("/room", middleware, async (req, res)=>{
   res.json({
     message : "Room created successfully",
     roomId : room.id
+  })
+})
+
+app.post("/room/:slug", async (req, res)=>{
+  const slug = req.params.slug;
+  const room = await prismaClient.room.findFirst({
+    where:{
+      slug
+    }
+  })
+  return res.json({
+    room
   })
 
 })
