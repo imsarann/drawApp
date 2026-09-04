@@ -2,7 +2,7 @@ import{ WebSocketServer } from "ws";
 import jwt from "jsonwebtoken"
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { prismaClient } from "@repo/db/client";
-const wss  = new WebSocketServer({ port : 8080});
+const wss  = new WebSocketServer({ port : 3001});
 
 interface User {
     ws : WebSocket;
@@ -48,6 +48,7 @@ wss.on("connection", (ws, request) => {
     })
     ws.on("message", async (data : any)=>{
         const parsedData = JSON.parse(data as unknown as string);
+        console.log(parsedData)
         if(parsedData.type === "join_room"){
             //@ts-ignore
             const user : any  = users.find(x => x.ws === ws)
@@ -63,6 +64,7 @@ wss.on("connection", (ws, request) => {
         if(parsedData.type === "chat"){
             const roomId = parsedData.roomId
             const  message = parsedData.message
+            console.log("message received in WS backend : ",message )
             const roomusers = users.filter(user => user.rooms.includes(roomId));
             // sotre in db asynchronously to avoid delay in broacasting messages (key : queue)
             await prismaClient.chat.create({
@@ -72,7 +74,6 @@ wss.on("connection", (ws, request) => {
                     userId : userId
                 }
             })
-            
             roomusers.forEach(roomUser => roomUser.ws.send(JSON.stringify({
                 type : "Chat",
                 message : message,

@@ -2,20 +2,21 @@
 
 import { useEffect, useState } from "react"
 import useSocket from "../hooks/useSocket"
-import axios from "axios"
-import { BACKEND_URL } from "../app/config"
+// import axios from "axios"
+// import { BACKEND_URL } from "../app/config"
 
 export default function ChatRoomClient({
     messages,
     id
 }:{
-    messages : { message :string },
+    messages : { message :string }[],
     id : string
 }){
 
   const [chats, setChats] = useState(messages)
-  const { socket, loading } = useSocket();
   const [currentMessage, setCurrentMessage] = useState("")
+  const { socket, loading } = useSocket();
+  
   useEffect(()=>{
     if (socket && !loading){
 
@@ -25,33 +26,45 @@ export default function ChatRoomClient({
       }))
 
       socket.onmessage = ((event)=>{
+
+        alert("someone is texting")
           const parsedData = JSON.parse(event.data)
-          if (parsedData.type === "chat"){
+          console.log("parsed data in websocket frontend type",parsedData.type)
+          alert("message received")
+          if (parsedData.type.toLowerCase() === 'chat'){
             //@ts-ignore
               setChats(c  => [...c, {message : parsedData.message}])
+              alert("chats updated")
           }
       
       })
     }
   }, [socket, loading, id])
 
-  function onClickSend(currentMessage : any){
+  function onClickSend(mess : any){
             //@ts-ignore
-    setChats(c  => [...c, {message : currentMessage}])
-    socket?.send(JSON.stringify({
+    setChats(c  => [...c, {message : mess}])
+    console.log("Message in chat : ", mess)
+    const data = JSON.stringify({
       type : "chat",
       roomId : id,
-      messages : currentMessage
-    }))
+      message : mess
+    })
+    console.log("The data before ws store :" ,data)
+    socket?.send(data)
     setCurrentMessage("")
   }
 
   return (
-    <div>
-        
+    <div>       
       {
-            //@ts-ignore
-      messages.map( m => <div> {m.message}</div>)}
+      //@ts-ignore
+      chats.map( m => {
+        return (
+        <div > {m.message}</div>)
+          }
+        )
+      }
       <input type="text" value={currentMessage} onChange={(e) => 
           setCurrentMessage(e.target.value)
           }/>

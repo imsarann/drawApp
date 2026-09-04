@@ -8,7 +8,7 @@ import { JWT_SECRET } from "@repo/backend-common/config";
 const app = express()
 app.use(express.json());
 
-app.listen(3001, ()=>{
+app.listen(8080, ()=>{
   console.log("express connected 3001");
 })
 
@@ -20,7 +20,7 @@ app.get("/", (req, res)=>{
   })
 })
 
-app.get("/chats/:roomId", async (req, res)=>{
+app.get("/chat/:roomId", async (req, res)=>{
   const roomId = Number(req.params.roomId);
   const messages = await prismaClient.chat.findMany({
     where:{
@@ -127,7 +127,7 @@ app.post("/room", middleware, async (req, res)=>{
   })
 })
 
-app.post("/room/:slug", async (req, res)=>{
+app.get("/room/:slug", async (req, res)=>{
   const slug = req.params.slug;
   const room = await prismaClient.room.findFirst({
     where:{
