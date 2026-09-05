@@ -37,7 +37,7 @@ wss.on("connection", (ws, request) => {
     const userId = checkUser(token);
     if(userId == null){
         ws.close();
-        return; 
+        return null; 
     } 
     users.push({
 
@@ -49,11 +49,13 @@ wss.on("connection", (ws, request) => {
     ws.on("message", async (data : any)=>{
         const parsedData = JSON.parse(data as unknown as string);
         console.log(parsedData)
+        
         if(parsedData.type === "join_room"){
             //@ts-ignore
             const user : any  = users.find(x => x.ws === ws)
             user?.rooms.push(parsedData.roomId)
         } 
+        
         // ws.send("pong")
         if(parsedData.type === "leave_room"){
             //@ts-ignore
@@ -61,6 +63,7 @@ wss.on("connection", (ws, request) => {
             //@ts-ignore
             user.rooms = user.rooms.filter(r => r === parsedData.room )
         }
+        
         if(parsedData.type === "chat"){
             const roomId = parsedData.roomId
             const  message = parsedData.message
@@ -73,7 +76,8 @@ wss.on("connection", (ws, request) => {
                     message :  message,
                     userId : userId
                 }
-            })
+            });
+            
             roomusers.forEach(roomUser => roomUser.ws.send(JSON.stringify({
                 type : "Chat",
                 message : message,
